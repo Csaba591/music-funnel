@@ -1,13 +1,11 @@
-import { useStorage } from "@core/hooks";
-import { Playlist } from "@core/models";
-import { useState } from "react";
+import { ActivePlaylistContext } from "@core/contexts";
+import { useContext, useState } from "react";
 
 export function PlayLists() {
-  const [playlists, setPlaylists] = useStorage<Playlist[]>("playlists");
+  const { activePlaylistId, setActivePlaylistId, playlists, setPlaylists } =
+    useContext(ActivePlaylistContext);
 
-  const [activePlaylist, setActivePlaylist] = useState<string | null>(
-    playlists?.[0].id ?? null
-  );
+  const playlistsSorted = playlists?.sort((a, b) => a.id.localeCompare(b.id));
 
   const [newPlaylistName, setNewPlaylistName] = useState<string>("");
 
@@ -32,11 +30,11 @@ export function PlayLists() {
         </button>
       </div>
 
-      {playlists?.map((playlist) => (
+      {playlistsSorted?.map((playlist) => (
         <button
-          onClick={() => setActivePlaylist(playlist.id)}
+          onClick={() => setActivePlaylistId(playlist.id)}
           className={`button is-fullwidth mt-2 ${
-            activePlaylist === playlist.id ? "has-text-weight-bold" : ""
+            activePlaylistId === playlist.id ? "has-text-weight-bold" : ""
           }`}
           key={playlist.id}
         >

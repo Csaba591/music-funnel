@@ -1,6 +1,8 @@
 import { useStorage } from "@core/hooks";
 import { SongResult } from "../components/SongResult";
 import { SongResultModel } from "../models";
+import { ActivePlaylistContext } from "@core/contexts";
+import { useContext } from "react";
 
 export function SearchPage() {
   const results: SongResultModel[] = [
@@ -25,21 +27,53 @@ export function SearchPage() {
   const [savedSongs, setSavedSongs] =
     useStorage<SongResultModel[]>("saved-songs");
 
+  const { activePlaylistId, setActivePlaylistId, playlists, setPlaylists } =
+    useContext(ActivePlaylistContext);
+
+  const activePlaylist = playlists?.find(
+    (playlist) => playlist.id === activePlaylistId
+  );
+
   function isSongSaved(song: SongResultModel) {
     return (
-      savedSongs && savedSongs.some((savedSong) => savedSong.id === song.id)
+      activePlaylist && activePlaylist.songIds.some((id) => id === song.id)
     );
   }
 
   function removeSong(song: SongResultModel) {
-    setSavedSongs((savedSongs) => {
-      if (!savedSongs) return null;
-      return savedSongs?.filter((savedSong) => savedSong.id !== song.id);
+    setPlaylists((storedPlaylists) => {
+      if (!storedPlaylists || !activePlaylist) return storedPlaylists;
+
+      const updatedActivePlaylist = {
+        ...activePlaylist,
+        songIds: activePlaylist.songIds.filter((id) => id !== song.id),
+      };
+
+      return [
+        ...storedPlaylists.filter(
+          (playlist) => playlist.id !== activePlaylistId
+        ),
+        updatedActivePlaylist,
+      ];
     });
   }
 
   function saveSong(song: SongResultModel) {
-    setSavedSongs((savedSongs) => [...(savedSongs ?? []), song]);
+    setPlaylists((storedPlaylists) => {
+      if (!storedPlaylists || !activePlaylist) return storedPlaylists;
+
+      const updatedActivePlaylist = {
+        ...activePlaylist,
+        songIds: [...activePlaylist.songIds, song.id],
+      };
+
+      return [
+        ...storedPlaylists.filter(
+          (playlist) => playlist.id !== activePlaylistId
+        ),
+        updatedActivePlaylist,
+      ];
+    });
   }
 
   return (
