@@ -11,7 +11,7 @@ export function Footer() {
   };
 
   return (
-    <footer>
+    <footer className="has-background-light">
       <YouTube videoId="ZBJjOvQqW70" opts={opts} />
     </footer>
   );

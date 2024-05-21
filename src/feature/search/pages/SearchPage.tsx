@@ -43,7 +43,7 @@ export function SearchPage() {
   }
 
   return (
-    <main className="container">
+    <main>
       <input placeholder="Search" type="text" />
 
       <section className="results">
