@@ -1,5 +1,6 @@
+import { MusicPlayerContext } from "@core/contexts/MusicPlayerContext";
 import { SongResultModel } from "@feature/search/models";
-import React from "react";
+import React, { useContext } from "react";
 
 export function SongResult({
   data,
@@ -8,8 +9,17 @@ export function SongResult({
   data: SongResultModel;
   children: React.ReactNode;
 }) {
+  const { song, setSong } = useContext(MusicPlayerContext);
+
+  function playSong() {
+    setSong(data);
+  }
+
   return (
     <div className="box is-flex" style={{ gap: "1.2em" }}>
+      <button onClick={playSong} type="button">
+        Play
+      </button>
       <img className="image is-64x64" src={data.imageUrl} />
       <div>
         <div>{data.title}</div>
