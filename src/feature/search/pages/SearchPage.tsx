@@ -2,41 +2,20 @@ import { useStorage } from "@core/hooks";
 import { SongResult } from "../components/SongResult";
 import { SongResultModel } from "../models";
 import { ActivePlaylistContext } from "@core/contexts";
-import { useContext } from "react";
+import { useContext, useState } from "react";
+import { querySongs } from "../api/song-search.api";
 
 export function SearchPage() {
-  const results: SongResultModel[] = [
-    {
-      id: "a",
-      title: "Scary Monsters And Nice Sprites",
-      artists: ["Skrillex"],
-      length: 248,
-      imageUrl:
-        "https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2Fe4f4e332134c2b175e59a6c0aa01e214.1000x1000x1.jpg",
-      source: "youtube",
-      url: "https://www.youtube.com/watch?v=ZBJjOvQqW70",
-    },
-    {
-      id: "b",
-      title: "Lies",
-      artists: ["MARINA"],
-      length: 226,
-      imageUrl:
-        "https://t2.genius.com/unsafe/340x340/https%3A%2F%2Fimages.genius.com%2Fc65124d356c7af135715b413f4f63f48.1000x1000x1.png",
-      source: "spotify",
-      url: "https://open.spotify.com/track/64f5bf2jyAkrsucnG9FXot?si=322b2d942dc3440d",
-    },
-  ];
-
-  const [savedSongs, setSavedSongs] =
-    useStorage<SongResultModel[]>("saved-songs");
-
   const { activePlaylistId, setActivePlaylistId, playlists, setPlaylists } =
     useContext(ActivePlaylistContext);
 
   const activePlaylist = playlists?.find(
     (playlist) => playlist.id === activePlaylistId
   );
+
+  const [query, setQuery] = useState<string>("");
+
+  const results = querySongs(query);
 
   function isSongSaved(song: SongResultModel) {
     return (
@@ -82,7 +61,12 @@ export function SearchPage() {
 
   return (
     <main>
-      <input placeholder="Search" type="text" />
+      <input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search"
+        type="text"
+      />
 
       <section className="results">
         {results.map((result) => (
